@@ -22,8 +22,18 @@
   (if (not (= (length type-fastly-text) 0))
       (progn
         (insert-char (first-char type-fastly-text) 1)
-        (setq type-fastly-text (rest-char type-fastly-text)))
-      (message "Done.")))
+        (setq type-fastly-text (rest-char type-fastly-text)))))
+
+(defun fastly-backward-delete-char ()
+  "Delete the last character typed fastly, adding back the
+character to type-fastly-text."
+  (interactive)
+  (if (not (bobp)) ;; if not at beginning of buffer
+      (progn
+        (let ((last-char (string (preceding-char))))
+          (delete-backward-char 1)
+          (setq type-fastly-text (concat last-char type-fastly-text))))))
+
 
 ;;;###autoload
 (define-minor-mode type-fastly-mode
@@ -31,6 +41,7 @@
   :lighter " *"
   :keymap (let ((map (make-sparse-keymap)))
             (define-key map [remap self-insert-command] 'fastly-insert-char)
+            (define-key map (kbd "<backspace>") 'fastly-backward-delete-char)
             (define-key map (kbd "<S-escape>") 'type-fastly-mode)
             map)
   (if type-fastly-mode
