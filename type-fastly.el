@@ -1,5 +1,8 @@
 ;;; type-fastly.el --- a minor mode to fake your code presentations
 
+(make-variable-buffer-local
+ (defvar type-fastly-text "" "The text left to type fastly."))
+
 (defun get-file-string (file)
   "Read the contents of a file and return as a string."
   (with-current-buffer (find-file-noselect file)
@@ -8,12 +11,13 @@
 (defun read-file (name)
   "Prompts for file name and returns the file as a string."
   (interactive `(,(ido-read-file-name "Find file: ")))
-  (defvar type-fastly-text
+  (setq type-fastly-text
     (get-file-string (expand-file-name name))))
 
 (defun first-char (string) (string-to-char string))
-(defun rest-char (string) (substring string 1 nil))
+(defun rest-char (string) (substring-no-properties string 1 nil))
 (defun fastly-insert-char ()
+  "Insert the next character in type-fastly-text."
   (interactive)
   (if (not (= (length type-fastly-text) 0))
       (progn
